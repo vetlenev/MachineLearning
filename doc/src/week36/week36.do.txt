@@ -6,7 +6,7 @@ DATE: today
 !split
 ===== Plans for week 36 =====
 
-* Thursday: Summary from last week on SVD, Statistics, probability theory and linear regression
+* Thursday: Summary from last week on SVD, Statistics, probability theory and linear regression. "Video of Lecture":"https://www.uio.no/studier/emner/matnat/fys/FYS-STK3155/h21/forelesningsvideoer/LectureSeptember9.mp4?vrtx=view-as-webpage".
 * Friday: Linear Regression and links with Statistics, Resampling methods and presentation of first project.
 
 Recommended Reading:
@@ -34,7 +34,7 @@ We used the SVD to analyse the matrix to invert in ordinary lineat regression
 Since the matrices here have dimension $p\times p$, with $p$ corresponding to the singular values, we defined last week the matrix
 !bt
 \[
-\bm{\Sigma}^T\bm{\Sigma} = \begin{bmatrix} \tilde{\bm{\Sigma}} & \bm{0}\\ \end{bmatrix}\begin{bmatrix} \tilde{\bm{\Sigma}} \\ \bm{0}\\ \end{bmatrix},
+\bm{\Sigma}^T\bm{\Sigma} = \begin{bmatrix} \tilde{\bm{\Sigma}} & \bm{0}\\ \end{bmatrix}\begin{bmatrix} \tilde{\bm{\Sigma}} \\ \bm{0}\end{bmatrix},
 \]
 !et
 where the tilde-matrix $\tilde{\bm{\Sigma}}$ is a matrix of dimension $p\times p$ containing only the singular values $\sigma_i$, that is
@@ -178,15 +178,64 @@ def SVDinv(A):
 
 
 #X = np.array([ [1.0, -1.0, 2.0], [1.0, 0.0, 1.0], [1.0, 2.0, -1.0], [1.0, 1.0, 0.0] ])
-X = np.array( [ [1,2],[2,3]])
+# Non-singular square matrix
+X = np.array( [ [1,2,3],[2,4,5],[3,5,6]])
 print(X)
 A = np.transpose(X) @ X
 # Brute force inversion
-B = np.linalg.inv(A)
+B = np.linalg.inv(A)  # here we could use np.linalg.pinv(A)
 C = SVDinv(A)
 print(np.abs(B-C))
+
 !ec
 
+!split
+===== Inverse of Rectangular Matrix =====
+
+Although our matrix to invert $\bm{X}^T\bm{X}$ is a square matrix, our matrix may be singular. 
+
+The pseudoinverse is the generalization of the matrix inverse for square matrices to
+rectangular matrices where the number of rows and columns are not equal.
+
+It is also called the the Moore-Penrose Inverse after two independent discoverers of the method or the Generalized Inverse.
+It is used for the calculation of the inverse for singular or near singular matrices and for rectangular matrices.
+
+Using the SVD we can obtain the pseudoinverse of a matrix $\bm{A}$ (labeled here as $\bm{A}_{\mathrm{PI}}$
+!bt
+\[
+\bm{A}_{\mathrm{PI}}= \bm{V}\bm{D}_{\mathrm{PI}}\bm{U}^T,
+\]
+!et
+where $\bm{D}_{\mathrm{PI}}$ can be calculated by creating a diagonal matrix from $\bm{Sigma}$ where we only keep the singular values (the non-zero values). The following code computes the pseudoinvers of the matrix based on the SVD.
+
+
+!bc pycod
+import numpy as np
+# SVD inversion
+def SVDinv(A):
+    U, s, VT = np.linalg.svd(A)
+    # reciprocals of singular values of s
+    d = 1.0 / s
+    # create m x n D matrix
+    D = np.zeros(A.shape)
+    # populate D with n x n diagonal matrix
+    D[:A.shape[1], :A.shape[1]] = np.diag(d)
+    UT = np.transpose(U)
+    V = np.transpose(VT)
+    return np.matmul(V,np.matmul(D.T,UT))
+
+
+A = np.array([ [0.3, 0.4], [0.5, 0.6], [0.7, 0.8],[0.9, 1.0]])
+print(A)
+# Brute force inversion of super-collinear matrix
+B = np.linalg.pinv(A)
+print(B)
+# Compare our own algorithm with pinv
+C = SVDinv(A)
+print(np.abs(C-B))
+
+!ec
+As you can see from this example, our own decomposition based on the SVD agrees the pseudoinverse algorithm provided by _Numpy_.
 
 
 
@@ -474,10 +523,8 @@ which leads to
 \]
 !et
 
-Plotting these results (figure in handwritten notes for week 36) shows clearly that Lasso regression suppresses (sets to zero) values of $\beta_i$ for specific values of $\lambda$. Ridge regression reduces on the other hand the values of $\beta_i$ as function of $\lambda$.
+Plotting these results ("figure in handwritten notes for week 36":"https://github.com/CompPhysics/MachineLearning/blob/master/doc/HandWrittenNotes/2021/NotesSeptember9.pdf") shows clearly that Lasso regression suppresses (sets to zero) values of $\beta_i$ for specific values of $\lambda$. Ridge regression reduces on the other hand the values of $\beta_i$ as function of $\lambda$.
 
-We will now couple the discussions of ordinary least squares, Ridge and Lasso regression with a statistical interpretation, that is we move from a linear algebra analysis to a statistical analysis. In particular, we will focus on what the regularization terms can result in.
-We will amongst other things show that the regularization parameter can reduce considerably the variance of the parameters $\beta$.
 
 
 !split
@@ -690,7 +737,7 @@ for i in range(nlambdas):
 #    print(MSEPredict[i])
     # Now plot the results
 plt.figure()
-plt.plot(np.log10(lambdas), MSEPredict, 'r--', label = 'MSE Ridge Test')
+plt.plot(np.log10(lambdas), MSEPredict, 'r--', label = 'MSE Ridge Train')
 plt.xlabel('log10(lambda)')
 plt.ylabel('MSE')
 plt.legend()
@@ -751,7 +798,7 @@ for i in range(nlambdas):
     RegLasso = linear_model.Lasso(lmb)
     RegLasso.fit(X,y)
     ypredictLasso = RegLasso.predict(X)
-    print(RegLasso_coef_)
+    print(RegLasso.coef_)
     MSELassoPredict[i] = MSE(y,ypredictLasso)
 # Now plot the results
 plt.figure()
@@ -847,14 +894,24 @@ plt.ylabel('MSE')
 plt.legend()
 plt.show()
 
-
-
-
 !ec
+
+
+!split
+===== Friday September 10  =====
+
 
 
 !split 
 ===== Linking the regression analysis with a statistical interpretation =====
+
+We will now couple the discussions of ordinary least squares, Ridge
+and Lasso regression with a statistical interpretation, that is we
+move from a linear algebra analysis to a statistical analysis. In
+particular, we will focus on what the regularization terms can result
+in.  We will amongst other things show that the regularization
+parameter can reduce considerably the variance of the parameters
+$\beta$.
 
 
 The
@@ -979,8 +1036,7 @@ where we have used  that $\mathbb{E} (\mathbf{Y} \mathbf{Y}^{T}) =
 \sigma^2 \, \mathbf{I}_{nn}$. From $\mbox{Var}(\bm{\beta}) = \sigma^2
 \, (\mathbf{X}^{T} \mathbf{X})^{-1}$, one obtains an estimate of the
 variance of the estimate of the $j$-th regression coefficient:
-$\bm{\sigma}^2 (\bm{\beta}_j ) = \bm{\sigma}^2 \sqrt{
-[(\mathbf{X}^{T} \mathbf{X})^{-1}]_{jj} }$. This may be used to
+$\bm{\sigma}^2 (\bm{\beta}_j ) = \bm{\sigma}^2 [(\mathbf{X}^{T} \mathbf{X})^{-1}]_{jj} $. This may be used to
 construct a confidence interval for the estimates.
 
 
@@ -1047,18 +1103,35 @@ We assume now that the various $y_i$ values are stochastically distributed accor
 We define this distribution as
 !bt
 \[
-p(y_i\vert \bm{X};\bm{\beta})=\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\bm{X}_{i,*}\bm{\beta})^2}{2\sigma^2}\right]},
+p(y_i, \bm{X}\vert\bm{\beta})=\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\bm{X}_{i,*}\bm{\beta})^2}{2\sigma^2}\right]},
 \]
 !et
-which reads as finding the likelihood of an event $y_i$ given the input variables $\bm{X}$ and the parameters (to be determined) $\bm{\beta}$.
+which reads as finding the likelihood of an event $y_i$ with the input variables $\bm{X}$ given the parameters (to be determined) $\bm{\beta}$.
 
 Since these events are assumed to be independent and identicall distributed we can build the probability distribution function (PDF) for all possible event $\bm{y}$ as the product of the single events, that is we have
 
 !bt
 \[
-p(\bm{y}\vert \bm{X};\bm{\beta})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\bm{X}_{i,*}\bm{\beta})^2}{2\sigma^2}\right]}=\prod_{i=0}^{n-1}p(y_i\vert \bm{X};\bm{\beta}).
+p(\bm{y},\bm{X}\vert\bm{\beta})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\bm{X}_{i,*}\bm{\beta})^2}{2\sigma^2}\right]}=\prod_{i=0}^{n-1}p(y_i,\bm{X}\vert\bm{\beta}).
 \]
 !et
+
+We will write this in a more compact form reserving $\bm{D}$ for the domain of events, including the ouputs (targets) and the inputs. That is
+in case we have a simple one-dimensional input and output case
+!bt
+\[
+\bm{D}=[(x_0,y_0), (x_1,y_1),\dots, (x_{n-1},y_{n-1})].
+\]
+!et
+In the more general case the various inputs should be replaced by the possible features represented by the input data set $\bm{X}$. 
+We can now rewrite the above probability as 
+!bt
+\[
+p(\bm{D}\vert\bm{\beta})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\bm{X}_{i,*}\bm{\beta})^2}{2\sigma^2}\right]}.
+\]
+!et
+
+It is a conditional probability (see below) and reads as the likelihood of a domain of events $\bm{D}$ given a set of parameters $\bm{\beta}$.
 
 !split
 ===== Maximum Likelihood Estimation (MLE) =====
@@ -1095,7 +1168,7 @@ We could now define a new cost function to minimize, namely the negative logarit
 
 !bt
 \[
-C(\bm{\beta}=-\log{\prod_{i=0}^{n-1}p(y_i\vert \bm{X};\bm{\beta})}=-\sum_{i=0}^{n-1}\log{p(y_i\vert \bm{X};\bm{\beta})},
+C(\bm{\beta}=-\log{\prod_{i=0}^{n-1}p(y_i,\bm{X}\vert\bm{\beta})}=-\sum_{i=0}^{n-1}\log{p(y_i,\bm{X}\vert\bm{\beta})},
 \]
 !et
 which becomes
@@ -1120,7 +1193,7 @@ which leads to the well-known OLS equation for the optimal paramters $\beta$
 !et
 
 
-Before we make a similar analysis for Ridge and Lasso regression, we need a new reminder on statistics. 
+Before we make a similar analysis for Ridge and Lasso regression, we need a short reminder on statistics. 
 
 !split
 ===== More basic Statistics and Bayes' theorem =====
@@ -1145,7 +1218,7 @@ p(X \cup Y)= p(X)+p(Y)-p(X \cap Y).
 !bblock The product rule (aka joint probability) is given by
 !bt
 \[
-p(X \cup Y)= p(X,Y)= p(X\vert Y)p(Y)=p(Y\vert X)p(x),
+p(X \cup Y)= p(X,Y)= p(X\vert Y)p(Y)=p(Y\vert X)p(X),
 \]
 !et
 where we read $p(X\vert Y)$ as the likelihood of obtaining $X$ given $Y$.
@@ -1157,8 +1230,8 @@ If we have independent events then $p(X,Y)=p(X)p(Y)$.
 !split
 ===== Marginal Probability =====
 
-The marginal probability is defined in terms of only of the set of variables $X,Y$. For a discrete probability we have
-!bblock Discrete Probability
+The marginal probability is defined in terms of only one of the set of variables $X,Y$. For a discrete probability we have
+!bblock 
 !bt
 \[
 p(X)=\sum_{i=0}^{n-1}p(X,Y=y_i)=\sum_{i=0}^{n-1}p(X\vert Y=y_i)p(Y=y_i)=\sum_{i=0}^{n-1}p(X\vert y_i)p(y_i).
@@ -1196,13 +1269,281 @@ which we can rewrite as
 p(X\vert Y)= \frac{p(X,Y)}{\sum_{i=0}^{n-1}p(Y\vert X=x_i)p(x_i)}=\frac{p(Y\vert X)p(X)}{\sum_{i=0}^{n-1}p(Y\vert X=x_i)p(x_i)},
 \]
 !et
-which is Bayes' theorem. More text to be added here by Friday September 10.
+which is Bayes' theorem. It allows us to evaluate the uncertainty in in $X$ after we have observed $Y$. We can easily interchange $X$ with $Y$.  
+
+!split
+===== Interpretations of Bayes' Theorem =====
+
+The quantity $p(Y\vert X)$ on the right-hand side of the theorem is
+evaluated for the observed data $Y$ and can be viewed as a function of
+the parameter space represented by $X$. This function is not
+necesseraly normalized and is normally called the likelihood function.
+
+The function $p(X)$ on the right hand side is called the prior while the function on the left hand side is the called the posterior probability. The denominator on the right hand side serves as a normalization factor for the posterior distribution.
+
+Let us try to illustrate Bayes' theorem through an example.
+
+!split
+=====  Example of Usage of Bayes' theorem =====
+
+Let us suppose that you are undergoing a series of mammography scans in
+order to rule out possible breast cancer cases.  We define the
+sensitivity for a positive event by the variable $X$. It takes binary
+values with $X=1$ representing a positive event and $X=0$ being a
+negative event. We reserve $Y$ as a classification parameter for
+either a negative or a positive breast cancer confirmation. (Short note on wordings: positive here means having breast cancer, although none of us would consider this being a  positive thing).
+
+We let $Y=1$ represent the the case of having breast cancer and $Y=0$ as not.
+
+Let us assume that if you have breast cancer, the test will be positive with a probability of $0.8$, that is we have
+
+!bt
+\[
+p(X=1\vert Y=1) =0.8.
+\]
+!et
+
+This obviously sounds  scary since many would conclude that if the test is positive, there is a likelihood of $80\%$ for having cancer.
+It is however not correct, as the following Bayesian analysis shows.
+
+!split
+===== Doing it correctly =====
+
+If we look at various national surveys on breast cancer, the general likelihood of developing breast cancer is a very small number.
+Let us assume that the prior probability in the population as a whole is
+
+!bt
+\[
+p(Y=1) =0.004.
+\]
+!et
+
+We need also to account for the fact that the test may produce a false positive result (false alarm). Let us here assume that we have
+!bt
+\[
+p(X=1\vert Y=0) =0.1.
+\]
+!et
+
+Using Bayes' theorem we can then find the posterior probability that the person has breast cancer in case of a positive test, that is we can compute
+
+!bt
+\[
+p(Y=1\vert X=1)=\frac{p(X=1\vert Y=1)p(Y=1)}{p(X=1\vert Y=1)p(Y=1)+p(X=1\vert Y=0)p(Y=0)}=\frac{0.8\times 0.004}{0.8\times 0.004+0.1\times 0.996}=0.031.
+\]
+!et
+That is, in case of a positive test, there is only a $3\%$ chance of having breast cancer!
 
 
 !split
-===== Frliday September 10  =====
+===== Bayes' Theorem and Ridge and Lasso Regression =====
 
-Depending on where we end on Thursday September 9, we will revise the material for Friday. On Friday we will also discuss project 1.
+Hitherto we have discussed Ridge and Lasso regression in terms of a
+linear analysis. This may to many of you feel rather technical and
+perhaps not that intuitive. The question is whether we can develop a
+more intuitive way of understanding what Ridge and Lasso express.
+
+Before we proceed let us perform a Ridge, Lasso  and OLS analysis of a polynomial fit. 
+
+!split
+===== Test Function for what happens with OLS, Ridge and Lasso =====
+
+We will play around with a study of the values for the optimal
+parameters $\bm{\beta}$ using OLS, Ridge and Lasso regression.  For
+OLS, you will notice as function of the noise and polynomial degree,
+that the parameters $\beta$ will fluctuate from order to order in the
+polynomial fit and that for larger and larger polynomial degrees of freedom, the parameters will tend to increase in value for OLS.
+
+For Ridge and Lasso regression, the higher order parameters will typically be reduced, providing thereby less fluctuations from one order to another one.
+
+!bc pycod
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn import linear_model
+
+def R2(y_data, y_model):
+    return 1 - np.sum((y_data - y_model) ** 2) / np.sum((y_data - np.mean(y_data)) ** 2)
+def MSE(y_data,y_model):
+    n = np.size(y_model)
+    return np.sum((y_data-y_model)**2)/n
+
+# Make data set.
+n = 10000
+x = np.random.rand(n)
+y = np.exp(-x**2) + 1.5 * np.exp(-(x-2)**2)+ np.random.randn(n)
+
+Maxpolydegree = 5
+X = np.zeros((len(x),Maxpolydegree))
+X[:,0] = 1.0
+
+for polydegree in range(1, Maxpolydegree):
+    for degree in range(polydegree):
+        X[:,degree] = x**(degree)
+
+
+# We split the data in test and training data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# matrix inversion to find beta
+OLSbeta = np.linalg.pinv(X_train.T @ X_train) @ X_train.T @ y_train
+print(OLSbeta)
+ypredictOLS = X_test @ OLSbeta
+print("Test MSE OLS")
+print(MSE(y_test,ypredictOLS))
+# Repeat now for Lasso and Ridge regression and various values of the regularization parameter using Scikit-Learn
+# Decide which values of lambda to use
+nlambdas = 4
+MSERidgePredict = np.zeros(nlambdas)
+MSELassoPredict = np.zeros(nlambdas)
+lambdas = np.logspace(-3, 1, nlambdas)
+for i in range(nlambdas):
+    lmb = lambdas[i]
+    # Make the fit using Ridge and Lasso
+    RegRidge = linear_model.Ridge(lmb,fit_intercept=False)
+    RegRidge.fit(X_train,y_train)
+    RegLasso = linear_model.Lasso(lmb,fit_intercept=False)
+    RegLasso.fit(X_train,y_train)
+    # and then make the prediction
+    ypredictRidge = RegRidge.predict(X_test)
+    ypredictLasso = RegLasso.predict(X_test)
+    # Compute the MSE and print it
+    MSERidgePredict[i] = MSE(y_test,ypredictRidge)
+    MSELassoPredict[i] = MSE(y_test,ypredictLasso)
+    print(lmb,RegRidge.coef_)
+    print(lmb,RegLasso.coef_)
+# Now plot the results
+plt.figure()
+plt.plot(np.log10(lambdas), MSERidgePredict, 'b', label = 'MSE Ridge Test')
+plt.plot(np.log10(lambdas), MSELassoPredict, 'r', label = 'MSE Lasso Test')
+plt.xlabel('log10(lambda)')
+plt.ylabel('MSE')
+plt.legend()
+plt.show()
+
+
+!ec
+
+How can we understand this?  
+
+
+!split
+===== Invoking Bayes' theorem =====
+
+Using Bayes' theorem we can gain a better intuition about Ridge and Lasso regression. 
+
+For ordinary least squares we postulated that the maximum likelihood for the doamin of events $\bm{D}$ (one-dimensional case)
+!bt
+\[
+\bm{D}=[(x_0,y_0), (x_1,y_1),\dots, (x_{n-1},y_{n-1})],
+\]
+!et
+is given by
+!bt
+\[
+p(\bm{D}\vert\bm{\beta})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\bm{X}_{i,*}\bm{\beta})^2}{2\sigma^2}\right]}.
+\]
+!et
+
+In Bayes' theorem this function plays the role of the so-called likelihood. We could now ask the question what is the posterior probability of a parameter set $\bm{\beta}$ given a domain of events $\bm{D}$?  That is, how can we define the posterior probability 
+
+!bt
+\[
+p(\bm{\beta}\vert\bm{D}).
+\]
+!et
+
+Bayes' theorem comes to our rescue here since (omitting the normalization constant)
+!bt
+\[
+p(\bm{\beta}\vert\bm{D})\propto p(\bm{D}\vert\bm{\beta})p(\bm{\beta}).
+\]
+!et
+
+We have a model for $p(\bm{D}\vert\bm{\beta})$ but need one for the _prior_ $p(\bm{\beta}$!   
+
+
+!split
+===== Ridge and Bayes =====
+
+With the posterior probability defined by a likelihood which we have
+already modeled and an unknown prior, we are now ready to make
+additional models for the prior.
+
+We can, based on our discussions of the variance of $\bm{\beta}$ and the mean value, assume that the prior for the values $\bm{\beta}$ is given by a Gaussian with mean value zero and variance $\tau^2$, that is
+
+!bt
+\[
+p(\bm{\beta})=\prod_{j=0}^{p-1}\exp{\left(-\frac{\beta_j^2}{2\tau^2}\right)}.
+\]
+!et
+
+Our posterior probability becomes then (omitting the normalization factor which is just a constant)
+!bt
+\[
+p(\bm{\beta\vert\bm{D})}=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\bm{X}_{i,*}\bm{\beta})^2}{2\sigma^2}\right]}\prod_{j=0}^{p-1}\exp{\left(-\frac{\beta_j^2}{2\tau^2}\right)}.
+\]
+!et
+
+
+We can now optimize this quantity with respect to $\bm{\beta}$. As we
+did for OLS, this is most conveniently done by taking the negative
+logarithm of the posterior probability. Doing so and leaving out the
+constants terms that do not depend on $\beta$, we have
+
+
+!bt
+\[
+C(\bm{\beta})=\frac{\vert\vert (\bm{y}-\bm{X}\bm{\beta})\vert\vert_2^2}{2\sigma^2}+\frac{1}{2\tau^2}\vert\vert\bm{\beta}\vert\vert_2^2,
+\]
+!et
+and replacing $1/2\tau^2$ with $\lambda$ we have
+
+!bt
+\[
+C(\bm{\beta})=\frac{\vert\vert (\bm{y}-\bm{X}\bm{\beta})\vert\vert_2^2}{2\sigma^2}+\lambda\vert\vert\bm{\beta}\vert\vert_2^2,
+\]
+!et
+which is our Ridge cost function!  Nice, isn't it?
+
+!split
+===== Lasso and Bayes =====
+
+To derive the Lasso cost function, we simply replace the Gaussian prior with an exponential distribution ("Laplace in this case":"https://en.wikipedia.org/wiki/Laplace_distribution") with zero mean value,  that is
+
+!bt
+\[
+p(\bm{\beta})=\prod_{j=0}^{p-1}\exp{\left(-\frac{\vert\beta_j\vert}{\tau}\right)}.
+\]
+!et
+
+Our posterior probability becomes then (omitting the normalization factor which is just a constant)
+!bt
+\[
+p(\bm{\beta}\vert\bm{D})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\bm{X}_{i,*}\bm{\beta})^2}{2\sigma^2}\right]}\prod_{j=0}^{p-1}\exp{\left(-\frac{\vert\beta_j\vert}{\tau}\right)}.
+\]
+!et
+
+
+Taking the negative
+logarithm of the posterior probability and leaving out the
+constants terms that do not depend on $\beta$, we have
+
+
+!bt
+\[
+C(\bm{\beta}=\frac{\vert\vert (\bm{y}-\bm{X}\bm{\beta})\vert\vert_2^2}{2\sigma^2}+\frac{1}{\tau}\vert\vert\bm{\beta}\vert\vert_1,
+\]
+!et
+and replacing $1/\tau$ with $\lambda$ we have
+
+!bt
+\[
+C(\bm{\beta}=\frac{\vert\vert (\bm{y}-\bm{X}\bm{\beta})\vert\vert_2^2}{2\sigma^2}+\lambda\vert\vert\bm{\beta}\vert\vert_1,
+\]
+!et
+which is our Lasso cost function!  
+
 
 
 !split

@@ -85,6 +85,10 @@ div { text-align: justify; text-justify: inter-word; }
                2,
                None,
                'code-for-svd-and-inversion-of-matrices'),
+              ('Inverse of Rectangular Matrix',
+               2,
+               None,
+               'inverse-of-rectangular-matrix'),
               ('Ridge and LASSO Regression',
                2,
                None,
@@ -132,6 +136,7 @@ div { text-align: justify; text-justify: inter-word; }
                2,
                None,
                'another-example-now-with-a-polynomial-fit'),
+              ('Friday September 10', 2, None, 'friday-september-10'),
               ('Linking the regression analysis with a statistical '
                'interpretation',
                2,
@@ -166,7 +171,26 @@ div { text-align: justify; text-justify: inter-word; }
               ('Marginal Probability', 2, None, 'marginal-probability'),
               ('Conditional  Probability', 2, None, 'conditional-probability'),
               ("Bayes' Theorem", 2, None, 'bayes-theorem'),
-              ('Frliday September 10', 2, None, 'frliday-september-10'),
+              ("Interpretations of Bayes' Theorem",
+               2,
+               None,
+               'interpretations-of-bayes-theorem'),
+              ("Example of Usage of Bayes' theorem",
+               2,
+               None,
+               'example-of-usage-of-bayes-theorem'),
+              ('Doing it correctly', 2, None, 'doing-it-correctly'),
+              ("Bayes' Theorem and Ridge and Lasso Regression",
+               2,
+               None,
+               'bayes-theorem-and-ridge-and-lasso-regression'),
+              ('Test Function for what happens with OLS, Ridge and Lasso',
+               2,
+               None,
+               'test-function-for-what-happens-with-ols-ridge-and-lasso'),
+              ("Invoking Bayes' theorem", 2, None, 'invoking-bayes-theorem'),
+              ('Ridge and Bayes', 2, None, 'ridge-and-bayes'),
+              ('Lasso and Bayes', 2, None, 'lasso-and-bayes'),
               ('Why resampling methods', 2, None, 'why-resampling-methods'),
               ('Resampling methods', 2, None, 'resampling-methods'),
               ('Resampling approaches can be computationally expensive',
@@ -296,7 +320,7 @@ MathJax.Hub.Config({
 <center>[2] <b>Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University</b></center>
 <br>
 <p>
-<center><h4>Sep 9, 2021</h4></center> <!-- date -->
+<center><h4>Sep 10, 2021</h4></center> <!-- date -->
 <br>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
@@ -304,7 +328,7 @@ MathJax.Hub.Config({
 <h2 id="plans-for-week-36">Plans for week 36 </h2>
 
 <ul>
-<li> Thursday: Summary from last week on SVD, Statistics, probability theory and linear regression</li>
+<li> Thursday: Summary from last week on SVD, Statistics, probability theory and linear regression. <a href="https://www.uio.no/studier/emner/matnat/fys/FYS-STK3155/h21/forelesningsvideoer/LectureSeptember9.mp4?vrtx=view-as-webpage" target="_blank">Video of Lecture</a>.</li>
 <li> Friday: Linear Regression and links with Statistics, Resampling methods and presentation of first project.</li>
 </ul>
 
@@ -338,7 +362,7 @@ $$
 
 Since the matrices here have dimension \( p\times p \), with \( p \) corresponding to the singular values, we defined last week the matrix
 $$
-\boldsymbol{\Sigma}^T\boldsymbol{\Sigma} = \begin{bmatrix} \tilde{\boldsymbol{\Sigma}} & \boldsymbol{0}\\ \end{bmatrix}\begin{bmatrix} \tilde{\boldsymbol{\Sigma}} \\ \boldsymbol{0}\\ \end{bmatrix},
+\boldsymbol{\Sigma}^T\boldsymbol{\Sigma} = \begin{bmatrix} \tilde{\boldsymbol{\Sigma}} & \boldsymbol{0}\\ \end{bmatrix}\begin{bmatrix} \tilde{\boldsymbol{\Sigma}} \\ \boldsymbol{0}\end{bmatrix},
 $$
 
 where the tilde-matrix \( \tilde{\boldsymbol{\Sigma}} \) is a matrix of dimension \( p\times p \) containing only the singular values \( \sigma_i \), that is
@@ -484,14 +508,69 @@ Let us first look at a matrix which does not causes problems and write our own f
 
 
 <span style="color: #408080; font-style: italic">#X = np.array([ [1.0, -1.0, 2.0], [1.0, 0.0, 1.0], [1.0, 2.0, -1.0], [1.0, 1.0, 0.0] ])</span>
-X <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array( [ [<span style="color: #666666">1</span>,<span style="color: #666666">2</span>],[<span style="color: #666666">2</span>,<span style="color: #666666">3</span>]])
+<span style="color: #408080; font-style: italic"># Non-singular square matrix</span>
+X <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array( [ [<span style="color: #666666">1</span>,<span style="color: #666666">2</span>,<span style="color: #666666">3</span>],[<span style="color: #666666">2</span>,<span style="color: #666666">4</span>,<span style="color: #666666">5</span>],[<span style="color: #666666">3</span>,<span style="color: #666666">5</span>,<span style="color: #666666">6</span>]])
 <span style="color: #008000">print</span>(X)
 A <span style="color: #666666">=</span> np<span style="color: #666666">.</span>transpose(X) <span style="color: #666666">@</span> X
 <span style="color: #408080; font-style: italic"># Brute force inversion</span>
-B <span style="color: #666666">=</span> np<span style="color: #666666">.</span>linalg<span style="color: #666666">.</span>inv(A)
+B <span style="color: #666666">=</span> np<span style="color: #666666">.</span>linalg<span style="color: #666666">.</span>inv(A)  <span style="color: #408080; font-style: italic"># here we could use np.linalg.pinv(A)</span>
 C <span style="color: #666666">=</span> SVDinv(A)
 <span style="color: #008000">print</span>(np<span style="color: #666666">.</span>abs(B<span style="color: #666666">-</span>C))
 </pre></div>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="inverse-of-rectangular-matrix">Inverse of Rectangular Matrix </h2>
+
+<p>
+Although our matrix to invert \( \boldsymbol{X}^T\boldsymbol{X} \) is a square matrix, our matrix may be singular.
+
+<p>
+The pseudoinverse is the generalization of the matrix inverse for square matrices to
+rectangular matrices where the number of rows and columns are not equal.
+
+<p>
+It is also called the the Moore-Penrose Inverse after two independent discoverers of the method or the Generalized Inverse.
+It is used for the calculation of the inverse for singular or near singular matrices and for rectangular matrices.
+
+<p>
+Using the SVD we can obtain the pseudoinverse of a matrix \( \boldsymbol{A} \) (labeled here as \( \boldsymbol{A}_{\mathrm{PI}} \)
+$$
+\boldsymbol{A}_{\mathrm{PI}}= \boldsymbol{V}\boldsymbol{D}_{\mathrm{PI}}\boldsymbol{U}^T,
+$$
+
+where \( \boldsymbol{D}_{\mathrm{PI}} \) can be calculated by creating a diagonal matrix from \( \boldsymbol{Sigma} \) where we only keep the singular values (the non-zero values). The following code computes the pseudoinvers of the matrix based on the SVD.
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
+<span style="color: #408080; font-style: italic"># SVD inversion</span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">SVDinv</span>(A):
+    U, s, VT <span style="color: #666666">=</span> np<span style="color: #666666">.</span>linalg<span style="color: #666666">.</span>svd(A)
+    <span style="color: #408080; font-style: italic"># reciprocals of singular values of s</span>
+    d <span style="color: #666666">=</span> <span style="color: #666666">1.0</span> <span style="color: #666666">/</span> s
+    <span style="color: #408080; font-style: italic"># create m x n D matrix</span>
+    D <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(A<span style="color: #666666">.</span>shape)
+    <span style="color: #408080; font-style: italic"># populate D with n x n diagonal matrix</span>
+    D[:A<span style="color: #666666">.</span>shape[<span style="color: #666666">1</span>], :A<span style="color: #666666">.</span>shape[<span style="color: #666666">1</span>]] <span style="color: #666666">=</span> np<span style="color: #666666">.</span>diag(d)
+    UT <span style="color: #666666">=</span> np<span style="color: #666666">.</span>transpose(U)
+    V <span style="color: #666666">=</span> np<span style="color: #666666">.</span>transpose(VT)
+    <span style="color: #008000; font-weight: bold">return</span> np<span style="color: #666666">.</span>matmul(V,np<span style="color: #666666">.</span>matmul(D<span style="color: #666666">.</span>T,UT))
+
+
+A <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array([ [<span style="color: #666666">0.3</span>, <span style="color: #666666">0.4</span>], [<span style="color: #666666">0.5</span>, <span style="color: #666666">0.6</span>], [<span style="color: #666666">0.7</span>, <span style="color: #666666">0.8</span>],[<span style="color: #666666">0.9</span>, <span style="color: #666666">1.0</span>]])
+<span style="color: #008000">print</span>(A)
+<span style="color: #408080; font-style: italic"># Brute force inversion of super-collinear matrix</span>
+B <span style="color: #666666">=</span> np<span style="color: #666666">.</span>linalg<span style="color: #666666">.</span>pinv(A)
+<span style="color: #008000">print</span>(B)
+<span style="color: #408080; font-style: italic"># Compare our own algorithm with pinv</span>
+C <span style="color: #666666">=</span> SVDinv(A)
+<span style="color: #008000">print</span>(np<span style="color: #666666">.</span>abs(C<span style="color: #666666">-</span>B))
+</pre></div>
+<p>
+As you can see from this example, our own decomposition based on the SVD agrees the pseudoinverse algorithm provided by <b>Numpy</b>.
+
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
@@ -773,11 +852,7 @@ $$
 $$
 
 <p>
-Plotting these results (figure in handwritten notes for week 36) shows clearly that Lasso regression suppresses (sets to zero) values of \( \beta_i \) for specific values of \( \lambda \). Ridge regression reduces on the other hand the values of \( \beta_i \) as function of \( \lambda \).
-
-<p>
-We will now couple the discussions of ordinary least squares, Ridge and Lasso regression with a statistical interpretation, that is we move from a linear algebra analysis to a statistical analysis. In particular, we will focus on what the regularization terms can result in.
-We will amongst other things show that the regularization parameter can reduce considerably the variance of the parameters \( \beta \).
+Plotting these results (<a href="https://github.com/CompPhysics/MachineLearning/blob/master/doc/HandWrittenNotes/2021/NotesSeptember9.pdf" target="_blank">figure in handwritten notes for week 36</a>) shows clearly that Lasso regression suppresses (sets to zero) values of \( \beta_i \) for specific values of \( \lambda \). Ridge regression reduces on the other hand the values of \( \beta_i \) as function of \( \lambda \).
 
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
@@ -996,7 +1071,7 @@ lambdas <span style="color: #666666">=</span> np<span style="color: #666666">.</
 <span style="color: #408080; font-style: italic">#    print(MSEPredict[i])</span>
     <span style="color: #408080; font-style: italic"># Now plot the results</span>
 plt<span style="color: #666666">.</span>figure()
-plt<span style="color: #666666">.</span>plot(np<span style="color: #666666">.</span>log10(lambdas), MSEPredict, <span style="color: #BA2121">&#39;r--&#39;</span>, label <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;MSE Ridge Test&#39;</span>)
+plt<span style="color: #666666">.</span>plot(np<span style="color: #666666">.</span>log10(lambdas), MSEPredict, <span style="color: #BA2121">&#39;r--&#39;</span>, label <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;MSE Ridge Train&#39;</span>)
 plt<span style="color: #666666">.</span>xlabel(<span style="color: #BA2121">&#39;log10(lambda)&#39;</span>)
 plt<span style="color: #666666">.</span>ylabel(<span style="color: #BA2121">&#39;MSE&#39;</span>)
 plt<span style="color: #666666">.</span>legend()
@@ -1059,7 +1134,7 @@ lambdas <span style="color: #666666">=</span> np<span style="color: #666666">.</
     RegLasso <span style="color: #666666">=</span> linear_model<span style="color: #666666">.</span>Lasso(lmb)
     RegLasso<span style="color: #666666">.</span>fit(X,y)
     ypredictLasso <span style="color: #666666">=</span> RegLasso<span style="color: #666666">.</span>predict(X)
-    <span style="color: #008000">print</span>(RegLasso_coef_)
+    <span style="color: #008000">print</span>(RegLasso<span style="color: #666666">.</span>coef_)
     MSELassoPredict[i] <span style="color: #666666">=</span> MSE(y,ypredictLasso)
 <span style="color: #408080; font-style: italic"># Now plot the results</span>
 plt<span style="color: #666666">.</span>figure()
@@ -1158,9 +1233,23 @@ plt<span style="color: #666666">.</span>legend()
 plt<span style="color: #666666">.</span>show()
 </pre></div>
 <p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="friday-september-10">Friday September 10  </h2>
+
+<p>
 <!-- !split  -->
 
 <h2 id="linking-the-regression-analysis-with-a-statistical-interpretation">Linking the regression analysis with a statistical interpretation </h2>
+
+<p>
+We will now couple the discussions of ordinary least squares, Ridge
+and Lasso regression with a statistical interpretation, that is we
+move from a linear algebra analysis to a statistical analysis. In
+particular, we will focus on what the regularization terms can result
+in.  We will amongst other things show that the regularization
+parameter can reduce considerably the variance of the parameters
+\( \beta \).
 
 <p>
 The
@@ -1296,8 +1385,7 @@ where we have used  that \( \mathbb{E} (\mathbf{Y} \mathbf{Y}^{T}) =
 \sigma^2 \, \mathbf{I}_{nn} \). From \( \mbox{Var}(\boldsymbol{\beta}) = \sigma^2
 \, (\mathbf{X}^{T} \mathbf{X})^{-1} \), one obtains an estimate of the
 variance of the estimate of the \( j \)-th regression coefficient:
-\( \boldsymbol{\sigma}^2 (\boldsymbol{\beta}_j ) = \boldsymbol{\sigma}^2 \sqrt{
-[(\mathbf{X}^{T} \mathbf{X})^{-1}]_{jj} } \). This may be used to
+\( \boldsymbol{\sigma}^2 (\boldsymbol{\beta}_j ) = \boldsymbol{\sigma}^2 [(\mathbf{X}^{T} \mathbf{X})^{-1}]_{jj}  \). This may be used to
 construct a confidence interval for the estimates.
 
 <p>
@@ -1367,17 +1455,33 @@ $$
 We assume now that the various \( y_i \) values are stochastically distributed according to the above Gaussian distribution. 
 We define this distribution as
 $$
-p(y_i\vert \boldsymbol{X};\boldsymbol{\beta})=\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\boldsymbol{X}_{i,*}\boldsymbol{\beta})^2}{2\sigma^2}\right]},
+p(y_i, \boldsymbol{X}\vert\boldsymbol{\beta})=\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\boldsymbol{X}_{i,*}\boldsymbol{\beta})^2}{2\sigma^2}\right]},
 $$
 
-which reads as finding the likelihood of an event \( y_i \) given the input variables \( \boldsymbol{X} \) and the parameters (to be determined) \( \boldsymbol{\beta} \).
+which reads as finding the likelihood of an event \( y_i \) with the input variables \( \boldsymbol{X} \) given the parameters (to be determined) \( \boldsymbol{\beta} \).
 
 <p>
 Since these events are assumed to be independent and identicall distributed we can build the probability distribution function (PDF) for all possible event \( \boldsymbol{y} \) as the product of the single events, that is we have
 
 $$
-p(\boldsymbol{y}\vert \boldsymbol{X};\boldsymbol{\beta})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\boldsymbol{X}_{i,*}\boldsymbol{\beta})^2}{2\sigma^2}\right]}=\prod_{i=0}^{n-1}p(y_i\vert \boldsymbol{X};\boldsymbol{\beta}).
+p(\boldsymbol{y},\boldsymbol{X}\vert\boldsymbol{\beta})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\boldsymbol{X}_{i,*}\boldsymbol{\beta})^2}{2\sigma^2}\right]}=\prod_{i=0}^{n-1}p(y_i,\boldsymbol{X}\vert\boldsymbol{\beta}).
 $$
+
+<p>
+We will write this in a more compact form reserving \( \boldsymbol{D} \) for the domain of events, including the ouputs (targets) and the inputs. That is
+in case we have a simple one-dimensional input and output case
+$$
+\boldsymbol{D}=[(x_0,y_0), (x_1,y_1),\dots, (x_{n-1},y_{n-1})].
+$$
+
+In the more general case the various inputs should be replaced by the possible features represented by the input data set \( \boldsymbol{X} \). 
+We can now rewrite the above probability as 
+$$
+p(\boldsymbol{D}\vert\boldsymbol{\beta})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\boldsymbol{X}_{i,*}\boldsymbol{\beta})^2}{2\sigma^2}\right]}.
+$$
+
+<p>
+It is a conditional probability (see below) and reads as the likelihood of a domain of events \( \boldsymbol{D} \) given a set of parameters \( \boldsymbol{\beta} \).
 
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
@@ -1418,7 +1522,7 @@ is equivalent to the maximization/minimization of the function itself.
 We could now define a new cost function to minimize, namely the negative logarithm of the above PDF
 
 $$
-C(\boldsymbol{\beta}=-\log{\prod_{i=0}^{n-1}p(y_i\vert \boldsymbol{X};\boldsymbol{\beta})}=-\sum_{i=0}^{n-1}\log{p(y_i\vert \boldsymbol{X};\boldsymbol{\beta})},
+C(\boldsymbol{\beta}=-\log{\prod_{i=0}^{n-1}p(y_i,\boldsymbol{X}\vert\boldsymbol{\beta})}=-\sum_{i=0}^{n-1}\log{p(y_i,\boldsymbol{X}\vert\boldsymbol{\beta})},
 $$
 
 which becomes
@@ -1439,7 +1543,7 @@ $$
 $$
 
 <p>
-Before we make a similar analysis for Ridge and Lasso regression, we need a new reminder on statistics.
+Before we make a similar analysis for Ridge and Lasso regression, we need a short reminder on statistics.
 
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
@@ -1472,7 +1576,7 @@ $$
 <b>The product rule (aka joint probability) is given by</b>
 <p>
 $$
-p(X \cup Y)= p(X,Y)= p(X\vert Y)p(Y)=p(Y\vert X)p(x),
+p(X \cup Y)= p(X,Y)= p(X\vert Y)p(Y)=p(Y\vert X)p(X),
 $$
 
 where we read \( p(X\vert Y) \) as the likelihood of obtaining \( X \) given \( Y \).
@@ -1488,9 +1592,9 @@ If we have independent events then \( p(X,Y)=p(X)p(Y) \).
 <h2 id="marginal-probability">Marginal Probability </h2>
 
 <p>
-The marginal probability is defined in terms of only of the set of variables \( X,Y \). For a discrete probability we have
+The marginal probability is defined in terms of only one of the set of variables \( X,Y \). For a discrete probability we have
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Discrete Probability</b>
+<b></b>
 <p>
 $$
 p(X)=\sum_{i=0}^{n-1}p(X,Y=y_i)=\sum_{i=0}^{n-1}p(X\vert Y=y_i)p(Y=y_i)=\sum_{i=0}^{n-1}p(X\vert y_i)p(y_i).
@@ -1531,15 +1635,289 @@ $$
 p(X\vert Y)= \frac{p(X,Y)}{\sum_{i=0}^{n-1}p(Y\vert X=x_i)p(x_i)}=\frac{p(Y\vert X)p(X)}{\sum_{i=0}^{n-1}p(Y\vert X=x_i)p(x_i)},
 $$
 
-which is Bayes' theorem. More text to be added here by Friday September 10.
+which is Bayes' theorem. It allows us to evaluate the uncertainty in in \( X \) after we have observed \( Y \). We can easily interchange \( X \) with \( Y \).
 
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="frliday-september-10">Frliday September 10  </h2>
+<h2 id="interpretations-of-bayes-theorem">Interpretations of Bayes' Theorem </h2>
 
 <p>
-Depending on where we end on Thursday September 9, we will revise the material for Friday. On Friday we will also discuss project 1.
+The quantity \( p(Y\vert X) \) on the right-hand side of the theorem is
+evaluated for the observed data \( Y \) and can be viewed as a function of
+the parameter space represented by \( X \). This function is not
+necesseraly normalized and is normally called the likelihood function.
+
+<p>
+The function \( p(X) \) on the right hand side is called the prior while the function on the left hand side is the called the posterior probability. The denominator on the right hand side serves as a normalization factor for the posterior distribution.
+
+<p>
+Let us try to illustrate Bayes' theorem through an example.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="example-of-usage-of-bayes-theorem">Example of Usage of Bayes' theorem </h2>
+
+<p>
+Let us suppose that you are undergoing a series of mammography scans in
+order to rule out possible breast cancer cases.  We define the
+sensitivity for a positive event by the variable \( X \). It takes binary
+values with \( X=1 \) representing a positive event and \( X=0 \) being a
+negative event. We reserve \( Y \) as a classification parameter for
+either a negative or a positive breast cancer confirmation. (Short note on wordings: positive here means having breast cancer, although none of us would consider this being a  positive thing).
+
+<p>
+We let \( Y=1 \) represent the the case of having breast cancer and \( Y=0 \) as not.
+
+<p>
+Let us assume that if you have breast cancer, the test will be positive with a probability of \( 0.8 \), that is we have
+
+$$
+p(X=1\vert Y=1) =0.8.
+$$
+
+<p>
+This obviously sounds  scary since many would conclude that if the test is positive, there is a likelihood of \( 80\% \) for having cancer.
+It is however not correct, as the following Bayesian analysis shows.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="doing-it-correctly">Doing it correctly </h2>
+
+<p>
+If we look at various national surveys on breast cancer, the general likelihood of developing breast cancer is a very small number.
+Let us assume that the prior probability in the population as a whole is
+
+$$
+p(Y=1) =0.004.
+$$
+
+<p>
+We need also to account for the fact that the test may produce a false positive result (false alarm). Let us here assume that we have
+$$
+p(X=1\vert Y=0) =0.1.
+$$
+
+<p>
+Using Bayes' theorem we can then find the posterior probability that the person has breast cancer in case of a positive test, that is we can compute
+
+$$
+p(Y=1\vert X=1)=\frac{p(X=1\vert Y=1)p(Y=1)}{p(X=1\vert Y=1)p(Y=1)+p(X=1\vert Y=0)p(Y=0)}=\frac{0.8\times 0.004}{0.8\times 0.004+0.1\times 0.996}=0.031.
+$$
+
+That is, in case of a positive test, there is only a \( 3\% \) chance of having breast cancer!
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="bayes-theorem-and-ridge-and-lasso-regression">Bayes' Theorem and Ridge and Lasso Regression </h2>
+
+<p>
+Hitherto we have discussed Ridge and Lasso regression in terms of a
+linear analysis. This may to many of you feel rather technical and
+perhaps not that intuitive. The question is whether we can develop a
+more intuitive way of understanding what Ridge and Lasso express.
+
+<p>
+Before we proceed let us perform a Ridge, Lasso  and OLS analysis of a polynomial fit.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="test-function-for-what-happens-with-ols-ridge-and-lasso">Test Function for what happens with OLS, Ridge and Lasso </h2>
+
+<p>
+We will play around with a study of the values for the optimal
+parameters \( \boldsymbol{\beta} \) using OLS, Ridge and Lasso regression.  For
+OLS, you will notice as function of the noise and polynomial degree,
+that the parameters \( \beta \) will fluctuate from order to order in the
+polynomial fit and that for larger and larger polynomial degrees of freedom, the parameters will tend to increase in value for OLS.
+
+<p>
+For Ridge and Lasso regression, the higher order parameters will typically be reduced, providing thereby less fluctuations from one order to another one.
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">sklearn.model_selection</span> <span style="color: #008000; font-weight: bold">import</span> train_test_split
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">sklearn</span> <span style="color: #008000; font-weight: bold">import</span> linear_model
+
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">R2</span>(y_data, y_model):
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">1</span> <span style="color: #666666">-</span> np<span style="color: #666666">.</span>sum((y_data <span style="color: #666666">-</span> y_model) <span style="color: #666666">**</span> <span style="color: #666666">2</span>) <span style="color: #666666">/</span> np<span style="color: #666666">.</span>sum((y_data <span style="color: #666666">-</span> np<span style="color: #666666">.</span>mean(y_data)) <span style="color: #666666">**</span> <span style="color: #666666">2</span>)
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">MSE</span>(y_data,y_model):
+    n <span style="color: #666666">=</span> np<span style="color: #666666">.</span>size(y_model)
+    <span style="color: #008000; font-weight: bold">return</span> np<span style="color: #666666">.</span>sum((y_data<span style="color: #666666">-</span>y_model)<span style="color: #666666">**2</span>)<span style="color: #666666">/</span>n
+
+<span style="color: #408080; font-style: italic"># Make data set.</span>
+n <span style="color: #666666">=</span> <span style="color: #666666">10000</span>
+x <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>rand(n)
+y <span style="color: #666666">=</span> np<span style="color: #666666">.</span>exp(<span style="color: #666666">-</span>x<span style="color: #666666">**2</span>) <span style="color: #666666">+</span> <span style="color: #666666">1.5</span> <span style="color: #666666">*</span> np<span style="color: #666666">.</span>exp(<span style="color: #666666">-</span>(x<span style="color: #666666">-2</span>)<span style="color: #666666">**2</span>)<span style="color: #666666">+</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randn(n)
+
+Maxpolydegree <span style="color: #666666">=</span> <span style="color: #666666">5</span>
+X <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((<span style="color: #008000">len</span>(x),Maxpolydegree))
+X[:,<span style="color: #666666">0</span>] <span style="color: #666666">=</span> <span style="color: #666666">1.0</span>
+
+<span style="color: #008000; font-weight: bold">for</span> polydegree <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #666666">1</span>, Maxpolydegree):
+    <span style="color: #008000; font-weight: bold">for</span> degree <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(polydegree):
+        X[:,degree] <span style="color: #666666">=</span> x<span style="color: #666666">**</span>(degree)
+
+
+<span style="color: #408080; font-style: italic"># We split the data in test and training data</span>
+X_train, X_test, y_train, y_test <span style="color: #666666">=</span> train_test_split(X, y, test_size<span style="color: #666666">=0.2</span>)
+
+<span style="color: #408080; font-style: italic"># matrix inversion to find beta</span>
+OLSbeta <span style="color: #666666">=</span> np<span style="color: #666666">.</span>linalg<span style="color: #666666">.</span>pinv(X_train<span style="color: #666666">.</span>T <span style="color: #666666">@</span> X_train) <span style="color: #666666">@</span> X_train<span style="color: #666666">.</span>T <span style="color: #666666">@</span> y_train
+<span style="color: #008000">print</span>(OLSbeta)
+ypredictOLS <span style="color: #666666">=</span> X_test <span style="color: #666666">@</span> OLSbeta
+<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;Test MSE OLS&quot;</span>)
+<span style="color: #008000">print</span>(MSE(y_test,ypredictOLS))
+<span style="color: #408080; font-style: italic"># Repeat now for Lasso and Ridge regression and various values of the regularization parameter using Scikit-Learn</span>
+<span style="color: #408080; font-style: italic"># Decide which values of lambda to use</span>
+nlambdas <span style="color: #666666">=</span> <span style="color: #666666">4</span>
+MSERidgePredict <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(nlambdas)
+MSELassoPredict <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(nlambdas)
+lambdas <span style="color: #666666">=</span> np<span style="color: #666666">.</span>logspace(<span style="color: #666666">-3</span>, <span style="color: #666666">1</span>, nlambdas)
+<span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(nlambdas):
+    lmb <span style="color: #666666">=</span> lambdas[i]
+    <span style="color: #408080; font-style: italic"># Make the fit using Ridge and Lasso</span>
+    RegRidge <span style="color: #666666">=</span> linear_model<span style="color: #666666">.</span>Ridge(lmb,fit_intercept<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+    RegRidge<span style="color: #666666">.</span>fit(X_train,y_train)
+    RegLasso <span style="color: #666666">=</span> linear_model<span style="color: #666666">.</span>Lasso(lmb,fit_intercept<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+    RegLasso<span style="color: #666666">.</span>fit(X_train,y_train)
+    <span style="color: #408080; font-style: italic"># and then make the prediction</span>
+    ypredictRidge <span style="color: #666666">=</span> RegRidge<span style="color: #666666">.</span>predict(X_test)
+    ypredictLasso <span style="color: #666666">=</span> RegLasso<span style="color: #666666">.</span>predict(X_test)
+    <span style="color: #408080; font-style: italic"># Compute the MSE and print it</span>
+    MSERidgePredict[i] <span style="color: #666666">=</span> MSE(y_test,ypredictRidge)
+    MSELassoPredict[i] <span style="color: #666666">=</span> MSE(y_test,ypredictLasso)
+    <span style="color: #008000">print</span>(lmb,RegRidge<span style="color: #666666">.</span>coef_)
+    <span style="color: #008000">print</span>(lmb,RegLasso<span style="color: #666666">.</span>coef_)
+<span style="color: #408080; font-style: italic"># Now plot the results</span>
+plt<span style="color: #666666">.</span>figure()
+plt<span style="color: #666666">.</span>plot(np<span style="color: #666666">.</span>log10(lambdas), MSERidgePredict, <span style="color: #BA2121">&#39;b&#39;</span>, label <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;MSE Ridge Test&#39;</span>)
+plt<span style="color: #666666">.</span>plot(np<span style="color: #666666">.</span>log10(lambdas), MSELassoPredict, <span style="color: #BA2121">&#39;r&#39;</span>, label <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;MSE Lasso Test&#39;</span>)
+plt<span style="color: #666666">.</span>xlabel(<span style="color: #BA2121">&#39;log10(lambda)&#39;</span>)
+plt<span style="color: #666666">.</span>ylabel(<span style="color: #BA2121">&#39;MSE&#39;</span>)
+plt<span style="color: #666666">.</span>legend()
+plt<span style="color: #666666">.</span>show()
+</pre></div>
+<p>
+How can we understand this?
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="invoking-bayes-theorem">Invoking Bayes' theorem </h2>
+
+<p>
+Using Bayes' theorem we can gain a better intuition about Ridge and Lasso regression.
+
+<p>
+For ordinary least squares we postulated that the maximum likelihood for the doamin of events \( \boldsymbol{D} \) (one-dimensional case)
+$$
+\boldsymbol{D}=[(x_0,y_0), (x_1,y_1),\dots, (x_{n-1},y_{n-1})],
+$$
+
+is given by
+$$
+p(\boldsymbol{D}\vert\boldsymbol{\beta})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\boldsymbol{X}_{i,*}\boldsymbol{\beta})^2}{2\sigma^2}\right]}.
+$$
+
+<p>
+In Bayes' theorem this function plays the role of the so-called likelihood. We could now ask the question what is the posterior probability of a parameter set \( \boldsymbol{\beta} \) given a domain of events \( \boldsymbol{D} \)?  That is, how can we define the posterior probability 
+
+$$
+p(\boldsymbol{\beta}\vert\boldsymbol{D}).
+$$
+
+<p>
+Bayes' theorem comes to our rescue here since (omitting the normalization constant)
+$$
+p(\boldsymbol{\beta}\vert\boldsymbol{D})\propto p(\boldsymbol{D}\vert\boldsymbol{\beta})p(\boldsymbol{\beta}).
+$$
+
+<p>
+We have a model for \( p(\boldsymbol{D}\vert\boldsymbol{\beta}) \) but need one for the <b>prior</b> \( p(\boldsymbol{\beta} \)!
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="ridge-and-bayes">Ridge and Bayes </h2>
+
+<p>
+With the posterior probability defined by a likelihood which we have
+already modeled and an unknown prior, we are now ready to make
+additional models for the prior.
+
+<p>
+We can, based on our discussions of the variance of \( \boldsymbol{\beta} \) and the mean value, assume that the prior for the values \( \boldsymbol{\beta} \) is given by a Gaussian with mean value zero and variance \( \tau^2 \), that is
+
+$$
+p(\boldsymbol{\beta})=\prod_{j=0}^{p-1}\exp{\left(-\frac{\beta_j^2}{2\tau^2}\right)}.
+$$
+
+<p>
+Our posterior probability becomes then (omitting the normalization factor which is just a constant)
+$$
+p(\boldsymbol{\beta\vert\boldsymbol{D})}=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\boldsymbol{X}_{i,*}\boldsymbol{\beta})^2}{2\sigma^2}\right]}\prod_{j=0}^{p-1}\exp{\left(-\frac{\beta_j^2}{2\tau^2}\right)}.
+$$
+
+<p>
+We can now optimize this quantity with respect to \( \boldsymbol{\beta} \). As we
+did for OLS, this is most conveniently done by taking the negative
+logarithm of the posterior probability. Doing so and leaving out the
+constants terms that do not depend on \( \beta \), we have
+
+$$
+C(\boldsymbol{\beta})=\frac{\vert\vert (\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta})\vert\vert_2^2}{2\sigma^2}+\frac{1}{2\tau^2}\vert\vert\boldsymbol{\beta}\vert\vert_2^2,
+$$
+
+and replacing \( 1/2\tau^2 \) with \( \lambda \) we have
+
+$$
+C(\boldsymbol{\beta})=\frac{\vert\vert (\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta})\vert\vert_2^2}{2\sigma^2}+\lambda\vert\vert\boldsymbol{\beta}\vert\vert_2^2,
+$$
+
+which is our Ridge cost function!  Nice, isn't it?
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="lasso-and-bayes">Lasso and Bayes </h2>
+
+<p>
+To derive the Lasso cost function, we simply replace the Gaussian prior with an exponential distribution (<a href="https://en.wikipedia.org/wiki/Laplace_distribution" target="_blank">Laplace in this case</a>) with zero mean value,  that is
+
+$$
+p(\boldsymbol{\beta})=\prod_{j=0}^{p-1}\exp{\left(-\frac{\vert\beta_j\vert}{\tau}\right)}.
+$$
+
+<p>
+Our posterior probability becomes then (omitting the normalization factor which is just a constant)
+$$
+p(\boldsymbol{\beta}\vert\boldsymbol{D})=\prod_{i=0}^{n-1}\frac{1}{\sqrt{2\pi\sigma^2}}\exp{\left[-\frac{(y_i-\boldsymbol{X}_{i,*}\boldsymbol{\beta})^2}{2\sigma^2}\right]}\prod_{j=0}^{p-1}\exp{\left(-\frac{\vert\beta_j\vert}{\tau}\right)}.
+$$
+
+<p>
+Taking the negative
+logarithm of the posterior probability and leaving out the
+constants terms that do not depend on \( \beta \), we have
+
+$$
+C(\boldsymbol{\beta}=\frac{\vert\vert (\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta})\vert\vert_2^2}{2\sigma^2}+\frac{1}{\tau}\vert\vert\boldsymbol{\beta}\vert\vert_1,
+$$
+
+and replacing \( 1/\tau \) with \( \lambda \) we have
+
+$$
+C(\boldsymbol{\beta}=\frac{\vert\vert (\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta})\vert\vert_2^2}{2\sigma^2}+\lambda\vert\vert\boldsymbol{\beta}\vert\vert_1,
+$$
+
+which is our Lasso cost function!
 
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
